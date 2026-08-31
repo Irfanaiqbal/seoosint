@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SHADOWTRACE · Free OSINT Reconnaissance Tool | Email, Username & Domain Lookup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SHADOWTRACE is a free passive OSINT reconnaissance platform — scan emails, usernames, domains and IPs for digital footprint analysis. No signup, browser-based OSINT tool.">
+  <meta name="keywords" content="OSINT tool, OSINT reconnaissance, email OSINT, username lookup, digital footprint, open source intelligence, domain lookup, IP lookup, free OSINT tool">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://shadowtrace.qzz.io/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="SHADOWTRACE · Free OSINT Reconnaissance Tool">
+  <meta property="og:description" content="Passive OSINT reconnaissance platform for digital footprint analysis — email, username, domain and IP intelligence.">
+  <meta property="og:url" content="https://shadowtrace.qzz.io/">
+  <meta property="og:site_name" content="SHADOWTRACE">
+  <meta property="og:image" content="https://shadowtrace.qzz.io/static/img/og-cover.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SHADOWTRACE · Free OSINT Reconnaissance Tool">
+  <meta name="twitter:description" content="Passive OSINT reconnaissance platform for digital footprint analysis.">
+  <meta name="twitter:image" content="https://shadowtrace.qzz.io/static/img/og-cover.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "SHADOWTRACE",
+    "url": "https://shadowtrace.qzz.io/",
+    "applicationCategory": "SecurityApplication",
+    "operatingSystem": "Any (Web-based)",
+    "description": "Passive OSINT reconnaissance platform for digital footprint analysis — email, username, domain and IP intelligence.",
+    "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}
+  }
+  </script>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="hrow">
+      <a class="logo" href="/">
+        <div class="logo-mark"><i class="fas fa-crosshairs"></i></div>
+        <span class="logo-text">SHADOWTRACE</span>
+        <span class="logo-badge">v2.0</span>
+      </a>
+      <nav class="hnav">
+        <a href="/blogs" class="nbtn"><i class="fas fa-book"></i> Blog</a>
+        <a href="mailto:shadowtrace5@proton.me" class="nbtn"><i class="fas fa-envelope"></i> Contact</a>
+        <button class="nbtn donate" onclick="openM('donate')"><i class="fas fa-heart"></i> Donate</button>
+      </nav>
+      <button class="hburger" onclick="toggleMob()"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<div class="mob-overlay" id="mobOverlay" onclick="closeMob()"></div>
+<div class="mob-panel" id="mobPanel">
+  <div class="mob-hd"><h3>MENU</h3><button class="mob-x" onclick="closeMob()"><i class="fas fa-times"></i></button></div>
+  <a href="mailto:shadowtrace5@proton.me" class="mob-item"><i class="fas fa-envelope"></i> Contact</a>
+  <button class="mob-item donate" onclick="openM('donate');closeMob()"><i class="fas fa-heart"></i> Donate</button>
+  <button class="mob-item" onclick="openM('privacy');closeMob()"><i class="fas fa-shield-alt"></i> Privacy</button>
+  <button class="mob-item" onclick="openM('guide');closeMob()"><i class="fas fa-book"></i> Guide</button>
+</div>
+
+<main>
+  <div class="wrap">
+
+    {% if notices %}
+    <div class="notice-stack">
+      {% for n in notices %}
+      <div class="notice-item" style="--nc:{{ n.hex }};--nbg:{{ n.bg }};--nglow:{{ n.glow }}">
+        <button class="notice-close" onclick="this.parentElement.remove()" title="Dismiss"><i class="fas fa-times"></i></button>
+        <div class="notice-head"><i class="fas fa-thumbtack"></i> {{ n.heading }}</div>
+        <div class="notice-body">{{ n.content }}{% if n.link_url %} — <a href="{{ n.link_url }}" target="_blank" rel="noopener noreferrer">Learn more <i class="fas fa-arrow-right"></i></a>{% endif %}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="hero">
+      <div class="hero-eye"><i class="fas fa-satellite-dish"></i> PASSIVE RECONNAISSANCE PLATFORM</div>
+      <h1>OSINT INTELLIGENCE</h1>
+      <p>Map digital footprints across email, username, domain, and phone data sources — passively, with no account required.</p>
+      <div class="hero-chips">
+        <div class="chip c"><i class="fas fa-envelope"></i> Email Lookup</div>
+        <div class="chip p"><i class="fas fa-user"></i> Username Trace</div>
+        <div class="chip g"><i class="fas fa-globe"></i> Domain Intel</div>
+        <div class="chip pk"><i class="fas fa-phone"></i> Phone OSINT</div>
+      </div>
+    </div>
+
+    <div class="hist-panel" id="histPanel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="hist-title"><i class="fas fa-history" style="color:var(--c);margin-right:8px"></i>RECENT SCANS</div>
+        <button class="hist-clear" onclick="clearHistory()">Clear all</button>
+      </div>
+      <div class="hist-list" id="histList"></div>
+    </div>
+
+    <div class="scanner">
+      <div class="scanner-bar"></div>
+
+      <div class="tabs">
+        <div class="tab active" data-mode="email"><div class="tab-dot"></div><i class="fas fa-envelope"></i> Email</div>
+        <div class="tab" data-mode="username"><div class="tab-dot"></div><i class="fas fa-user"></i> Username</div>
+        <div class="tab" data-mode="domain"><div class="tab-dot"></div><i class="fas fa-globe"></i> Domain</div>
+        <div class="tab" data-mode="phone"><div class="tab-dot"></div><i class="fas fa-phone"></i> Phone</div>
+      </div>
+
+      <div class="scan-mode-lbl" id="modeLbl">EMAIL SCAN MODE</div>
+
+      <div class="irow">
+        <div class="ibox">
+          <i class="fas fa-envelope" id="iicon"></i>
+          <input id="target" placeholder="e.g., user@example.com" autocomplete="off" spellcheck="false">
+        </div>
+        <button id="runBtn" class="ibtn" style="position:relative">
+          <i class="fas fa-bolt"></i> SCAN
+        </button>
+      </div>
+
+      <div class="toolbar">
+        <div class="disc"><i class="fas fa-shield-alt"></i> Passive recon only · Use responsibly</div>
+        <div class="tactions">
+          <button class="tact-btn" id="exportBtn" onclick="exportResults()" disabled>
+            <i class="fas fa-download"></i> Export JSON
+          </button>
+          <button class="tact-btn" onclick="openM('guide')">
+            <i class="fas fa-question-circle"></i> Guide
+          </button>
+        </div>
+      </div>
+
+      <div class="prog-wrap" id="progWrap">
+        <div class="prog-row">
+          <span id="progLabel">Initializing...</span>
+          <span class="prog-label" id="progPct">0%</span>
+        </div>
+        <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+      </div>
+      <div class="msg msg-err" id="errMsg"></div>
+      <div class="msg msg-ok" id="okMsg"></div>
+    </div>
+
+    <div class="queue-card" id="queueCard">
+      <div class="queue-spinner"></div>
+      <h3>QUEUED</h3>
+      <p style="color:var(--fg3);font-size:13px">Your position in queue</p>
+      <div class="queue-pos" id="queuePos">1</div>
+      <p style="color:var(--fg3);font-size:13px">Waiting for a free processing slot...</p>
+    </div>
+
+    <div class="loading" id="loading">
+      <div class="queue-spinner"></div>
+      <p><span id="loadLabel">SCANNING</span> — collecting intelligence...</p>
+    </div>
+
+    <div id="resultsWrap" style="display:none">
+      <div class="res-header">
+        <div class="res-title">INTELLIGENCE REPORT</div>
+        <div class="res-right">
+          <div class="res-count" id="resCount">0 items</div>
+        </div>
+      </div>
+      <div class="filter-row">
+        <input class="filter-input" id="filterInput" placeholder="Filter results..." oninput="filterResults()">
+      </div>
+      <div class="res-grid" id="resGrid"></div>
+    </div>
+
+    <div class="empty show" id="emptyState">
+      <div class="empty-icon"><i class="fas fa-satellite-dish"></i></div>
+      <h3>READY TO TRACE</h3>
+      <p>Enter a target above and press <span class="kbd">Enter</span> or click SCAN</p>
+      <div class="shortcuts" style="justify-content:center;margin-top:18px">
+        <span><span class="kbd">Tab</span> Switch mode</span>
+        <span><span class="kbd">Ctrl+K</span> Focus input</span>
+        <span><span class="kbd">Esc</span> Clear</span>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="frow">
+      <div class="fcopy">© 2026 SHADOWTRACE · OSINT PLATFORM</div>
+      <div class="flinks">
+        <a href="/blogs">Blog</a>
+        <a onclick="openM('privacy')">Privacy</a>
+        <a onclick="openM('guide')">Guide</a>
+        <a onclick="openM('donate')">Support</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg">Copied!</span></div>
+
+<!-- PRIVACY MODAL -->
+<div class="modal-bg" id="modal-privacy">
+  <div class="modal">
+    <div class="modal-hd"><h2>PRIVACY POLICY</h2><button class="modal-x" onclick="closeM('privacy')">&times;</button></div>
+    <div class="modal-body">
+      <div class="msec"><h3>Data Handling</h3><p>This platform performs passive reconnaissance using public APIs and open-source data. Scan targets are processed server-side and results are streamed directly to your browser.</p></div>
+      <div class="msec"><h3>Third-Party Sources</h3><p>We query public sources including WHOIS registries, DNS servers, social platform endpoints, and phone carrier databases. Your queries are never sold or shared with third parties.</p></div>
+      <div class="msec"><h3>Responsible Use</h3><p>This tool is intended for legitimate security research, digital footprint awareness, and OSINT education only. Always obtain proper authorisation before scanning any target you do not own or have explicit permission to scan.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- GUIDE MODAL -->
+<div class="modal-bg" id="modal-guide">
+  <div class="modal">
+    <div class="modal-hd"><h2>USAGE GUIDE</h2><button class="modal-x" onclick="closeM('guide')">&times;</button></div>
+    <div class="modal-body">
+      <div class="msec"><h3>Email</h3><p>Uses Holehe to check whether an email is registered on popular services. Returns confirmed registrations only.</p></div>
+      <div class="msec"><h3>Username</h3><p>Probes 40+ platforms for username existence via HTTP checks. Click a result card to open the profile directly.</p></div>
+      <div class="msec"><h3>Domain</h3><p>Performs WHOIS lookup, DNS enumeration (A, AAAA, MX, NS, TXT, CAA), IP resolution, web server fingerprinting, and TLS certificate inspection.</p></div>
+      <div class="msec"><h3>Phone</h3><p>Validates and formats the number, identifies carrier and geographic region, timezone, number type, and provides quick links to WhatsApp, Telegram, and Google.</p></div>
+      <div class="msec"><h3>Keyboard Shortcuts</h3>
+        <ul>
+          <li><strong>Enter</strong> — Start scan</li>
+          <li><strong>Tab</strong> — Cycle scan modes</li>
+          <li><strong>Ctrl + K</strong> — Focus input</li>
+          <li><strong>Escape</strong> — Clear / close</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DONATE MODAL -->
+<div class="modal-bg" id="modal-donate">
+  <div class="modal">
+    <div class="modal-hd"><h2>SUPPORT THE PROJECT</h2><button class="modal-x" onclick="closeM('donate')">&times;</button></div>
+    <div class="modal-body">
+      <p style="color:var(--fg2);font-size:14px;margin-bottom:4px">Help keep this service running and free. Every contribution is genuinely appreciated.</p>
+      <div class="crypto-grid">
+        <div class="ccard">
+          <div class="ccard-icon btc"><i class="fab fa-bitcoin"></i></div>
+          <h3 class="btc">Bitcoin</h3>
+          <div class="wallet" id="btcAddr">bc1qzpsqrjp5kuax6n6q0uuatkmeacc82rp8sfur7l</div>
+          <button class="cbtn" onclick="copyWallet('btcAddr','btcOk')"><i class="fas fa-copy"></i> COPY</button>
+          <div class="copied" id="btcOk">✓ Copied!</div>
+        </div>
+        <div class="ccard">
+          <div class="ccard-icon eth"><i class="fab fa-ethereum"></i></div>
+          <h3 class="eth">Ethereum</h3>
+          <div class="wallet" id="ethAddr">0x70e93cab6cc9a7c6c7f68662bfd2ca160d3afa3d</div>
+          <button class="cbtn" onclick="copyWallet('ethAddr','ethOk')"><i class="fas fa-copy"></i> COPY</button>
+          <div class="copied" id="ethOk">✓ Copied!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

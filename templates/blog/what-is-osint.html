@@ -1,0 +1,36 @@
+{% extends "blog/_base.html" %}
+{% block content %}
+<div class="breadcrumbs"><a href="/">Home</a> / <a href="/blogs">Blog</a> / What Is OSINT</div>
+<h1 class="blog-title">What Is OSINT? A Practical Guide to Open Source Intelligence</h1>
+<div class="blog-meta"><span><i class="fas fa-calendar"></i> Updated 2026</span><span><i class="fas fa-clock"></i> 6 min read</span></div>
+
+<div class="blog-body">
+<p>OSINT, short for Open Source Intelligence, is the practice of collecting and analyzing information that is publicly available — no hacking, no unauthorized access, just data that already exists in the open. Analysts, journalists, security researchers, and everyday people use OSINT to answer a simple question: <strong>what does the public record say about a target?</strong></p>
+
+<h2>Where OSINT Data Comes From</h2>
+<ul>
+  <li><strong>Search engines</strong> — indexed pages, cached content, and search operators</li>
+  <li><strong>Social media</strong> — public profiles, posts, and metadata</li>
+  <li><strong>WHOIS and DNS records</strong> — domain ownership and infrastructure history</li>
+  <li><strong>Breach databases</strong> — previously exposed credentials tied to an email</li>
+  <li><strong>Public government and business registries</strong></li>
+</ul>
+
+<h2>Common OSINT Use Cases</h2>
+<h3>Security research</h3>
+<p>Penetration testers use OSINT during the reconnaissance phase to map an organization's attack surface before any active testing begins.</p>
+<h3>Personal digital footprint audits</h3>
+<p>Individuals run their own email or username through OSINT tools to see exactly what a stranger — or a scammer — could learn about them in five minutes.</p>
+<h3>Journalism and fact-checking</h3>
+<p>Reporters verify claims, locate sources, and cross-reference public data before publishing.</p>
+
+<h2>How SHADOWTRACE Fits In</h2>
+<p>SHADOWTRACE automates the tedious parts of passive reconnaissance — email exposure checks, username enumeration across platforms, domain and IP intelligence — into a single free scan. It only touches publicly available data sources, in line with standard OSINT practice.</p>
+
+<div class="blog-cta">
+  <strong>Try it yourself</strong>
+  <p>Run a free passive OSINT scan on an email, username, domain, or IP.</p>
+  <a class="btn" href="/">Open the Scanner</a>
+</div>
+</div>
+{% endblock %}

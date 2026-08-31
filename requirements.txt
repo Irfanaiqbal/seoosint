@@ -1,0 +1,6 @@
+flask
+requests
+python-whois
+user-scanner
+gunicorn
+phonenumbers

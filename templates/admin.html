@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>System Dashboard</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+{% if not logged_in %}
+<div class="login-wrap">
+  <div class="login-box">
+    <div class="login-title">⬡ SYSTEM ACCESS</div>
+    <form method="POST">
+      <div class="login-field">
+        <label>Identifier</label>
+        <input type="text" name="username" autocomplete="off" required placeholder="enter identifier">
+      </div>
+      <div class="login-field">
+        <label>Access Key</label>
+        <input type="password" name="password" required placeholder="••••••••••••">
+      </div>
+      <input type="hidden" name="csrf" value="{{ csrf_token }}">
+      <button class="login-btn" type="submit">ACCESS SYSTEM</button>
+      {% if error %}<div class="login-err show">{{ error }}</div>{% endif %}
+    </form>
+  </div>
+</div>
+{% else %}
+<header>
+  <div class="wrap">
+    <div class="hrow">
+      <div class="logo"><i class="fas fa-server"></i> SYSTEM MONITOR</div>
+      <div class="hadmin">
+        <span class="badge live"><i class="fas fa-circle" style="font-size:8px"></i> LIVE</span>
+        <a href="?logout=1" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sign Out</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="stats">
+    <div class="scard s1">
+      <div class="scard-lbl">Total Scans</div>
+      <div class="scard-val">{{ stats.total }}</div>
+      <div class="scard-sub">all time</div>
+    </div>
+    <div class="scard s2">
+      <div class="scard-lbl">Scans Today</div>
+      <div class="scard-val">{{ stats.today }}</div>
+      <div class="scard-sub">{{ stats.today_date }}</div>
+    </div>
+    <div class="scard s3">
+      <div class="scard-lbl">Unique IPs</div>
+      <div class="scard-val">{{ stats.unique_ips }}</div>
+      <div class="scard-sub">total visitors</div>
+    </div>
+    <div class="scard s4">
+      <div class="scard-lbl">Rate Blocks</div>
+      <div class="scard-val">{{ stats.blocks }}</div>
+      <div class="scard-sub">blocked requests</div>
+    </div>
+    <div class="scard s5">
+      <div class="scard-lbl">Email Lookups</div>
+      <div class="scard-val">{{ stats.emails }}</div>
+      <div class="scard-sub">email scans run</div>
+    </div>
+  </div>
+
+  <div class="sec-tabs">
+    <button class="sec-tab active" onclick="showTab('scans')">
+      <i class="fas fa-list" style="margin-right:7px"></i>Scan Log
+    </button>
+    <button class="sec-tab" onclick="showTab('blocks')">
+      <i class="fas fa-ban" style="margin-right:7px"></i>Rate Blocks
+    </button>
+    <button class="sec-tab" onclick="showTab('ips')">
+      <i class="fas fa-network-wired" style="margin-right:7px"></i>IP Summary
+    </button>
+    <button class="sec-tab" onclick="showTab('notices')">
+      <i class="fas fa-thumbtack" style="margin-right:7px"></i>Notice Board
+    </button>
+  </div>
+
+  <!-- SCAN LOG -->
+  <div class="sec-panel show" id="tab-scans">
+    <div class="toolbar">
+      <input class="search-box" type="text" id="scanSearch" placeholder="Search IP, target, mode..." oninput="filterScans()">
+      <a href="?export=scans" class="ctrl-btn"><i class="fas fa-download"></i> Export CSV</a>
+      <button class="ctrl-btn danger" onclick="confirmClear('scans')"><i class="fas fa-trash"></i> Clear Logs</button>
+    </div>
+    <div class="tbl-wrap">
+      <table id="scanTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>TIMESTAMP (UTC)</th>
+            <th>IP ADDRESS</th>
+            <th>MODE</th>
+            <th>TARGET</th>
+            <th>USER AGENT</th>
+            <th>RESULTS</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in scans %}
+          <tr>
+            <td style="color:var(--fg3);font-family:'Space Mono',monospace;font-size:11px">{{ row[0] }}</td>
+            <td class="ts-cell">{{ row[1][:19].replace('T',' ') }}</td>
+            <td class="ip-cell">{{ row[2] }}</td>
+            <td><span class="mode-badge m-{{ row[3] }}">{{ row[3].upper() }}</span></td>
+            <td class="target-cell">{{ row[4][:60] }}{{ '...' if row[4]|length > 60 else '' }}</td>
+            <td style="font-size:11px;color:var(--fg3);max-width:180px">{{ (row[5] or '—')[:60] }}</td>
+            <td style="font-family:'Space Mono',monospace;font-size:12px;color:var(--y)">{{ row[6] or 0 }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7" class="tbl-empty">No scan records yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- RATE BLOCKS -->
+  <div class="sec-panel" id="tab-blocks">
+    <div class="toolbar">
+      <a href="?export=blocks" class="ctrl-btn"><i class="fas fa-download"></i> Export CSV</a>
+      <button class="ctrl-btn danger" onclick="confirmClear('blocks')"><i class="fas fa-trash"></i> Clear</button>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>TIMESTAMP</th>
+            <th>IP ADDRESS</th>
+            <th>REASON</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in blocks %}
+          <tr>
+            <td style="color:var(--fg3);font-family:'Space Mono',monospace;font-size:11px">{{ row[0] }}</td>
+            <td class="ts-cell">{{ row[1][:19].replace('T',' ') }}</td>
+            <td class="ip-cell">{{ row[2] }}</td>
+            <td><span class="mode-badge m-block">{{ row[3] or 'Rate Limit' }}</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="tbl-empty">No blocked requests.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- IP SUMMARY -->
+  <div class="sec-panel" id="tab-ips">
+    <div class="toolbar">
+      <a href="?export=ips" class="ctrl-btn"><i class="fas fa-download"></i> Export CSV</a>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>IP ADDRESS</th>
+            <th>TOTAL SCANS</th>
+            <th>EMAIL SCANS</th>
+            <th>PHONE SCANS</th>
+            <th>DOMAIN SCANS</th>
+            <th>USERNAME SCANS</th>
+            <th>LAST SEEN (UTC)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in ip_summary %}
+          <tr>
+            <td class="ip-cell">{{ row[0] }}</td>
+            <td style="font-family:'Space Mono',monospace;font-size:13px;color:var(--c)">{{ row[1] }}</td>
+            <td style="font-family:'Space Mono',monospace;font-size:12px">{{ row[2] }}</td>
+            <td style="font-family:'Space Mono',monospace;font-size:12px">{{ row[3] }}</td>
+            <td style="font-family:'Space Mono',monospace;font-size:12px">{{ row[4] }}</td>
+            <td style="font-family:'Space Mono',monospace;font-size:12px">{{ row[5] }}</td>
+            <td class="ts-cell">{{ row[6][:19].replace('T',' ') if row[6] else '—' }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7" class="tbl-empty">No data yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- NOTICE BOARD -->
+  <div class="sec-panel" id="tab-notices">
+    <form class="notice-form" method="POST" action="{{ notice_action }}" id="noticeForm">
+      <div class="nf-title" id="nfFormTitle"><i class="fas fa-plus"></i> Add Notice</div>
+      <input type="hidden" name="csrf" value="{{ csrf_token }}">
+      <input type="hidden" name="id" id="nfId" value="">
+      <div class="nf-row">
+        <label>Heading</label>
+        <input type="text" name="heading" id="nfHeading" maxlength="120" placeholder="e.g. Scheduled maintenance" required>
+      </div>
+      <div class="nf-row">
+        <label>Content</label>
+        <textarea name="content" id="nfContent" rows="3" maxlength="600" placeholder="Notice message shown to visitors..." required></textarea>
+      </div>
+      <div class="nf-row">
+        <label>Link URL (optional)</label>
+        <input type="text" name="link_url" id="nfLink" maxlength="300" placeholder="https://example.com">
+      </div>
+      <div class="nf-row">
+        <label>Color</label>
+        <div class="nf-swatches" id="nfSwatches">
+          {% for key, c in notice_colors.items() %}
+          <label class="nf-swatch{{ ' sel' if key=='cyan' else '' }}" style="background:{{ c.hex }}" data-key="{{ key }}">
+            <input type="radio" name="color_key" value="{{ key }}" {{ 'checked' if key=='cyan' else '' }} onchange="selSwatch(this)">
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="nf-actions">
+        <label class="nf-toggle"><input type="checkbox" name="active" value="1" checked> Active (visible on site)</label>
+      </div>
+      <div class="nf-actions" style="margin-top:14px">
+        <button type="submit" class="nf-submit" id="nfSubmit"><i class="fas fa-check"></i> Publish Notice</button>
+        <button type="button" class="nf-cancel" id="nfCancel" onclick="resetNoticeForm()">Cancel Edit</button>
+      </div>
+    </form>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>COLOR</th>
+            <th>HEADING</th>
+            <th>CONTENT</th>
+            <th>LINK</th>
+            <th>STATUS</th>
+            <th>CREATED (UTC)</th>
+            <th class="text-right">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for n in all_notices %}
+          <tr>
+            <td style="color:var(--fg3);font-family:'Space Mono',monospace;font-size:11px">{{ n.id }}</td>
+            <td><span class="n-color-dot" style="background:{{ n.hex }}"></span>{{ n.color_key }}</td>
+            <td style="color:var(--fg);font-weight:600">{{ n.heading }}</td>
+            <td class="n-content-cell">{{ n.content[:90] }}{{ '...' if n.content|length > 90 else '' }}</td>
+            <td>{% if n.link_url %}<i class="fas fa-link" style="color:var(--c)"></i>{% else %}—{% endif %}</td>
+            <td><span class="n-status {{ 'on' if n.active else 'off' }}">{{ 'ACTIVE' if n.active else 'HIDDEN' }}</span></td>
+            <td class="ts-cell">{{ n.created_at[:19].replace('T',' ') }}</td>
+            <td class="text-right">
+              <div class="n-actrow" style="justify-content:flex-end">
+                <button class="n-actbtn" onclick='editNotice({{ n.id }}, {{ n.heading|tojson }}, {{ n.content|tojson }}, {{ n.link_url|tojson }}, {{ n.color_key|tojson }}, {{ n.active|tojson }})'><i class="fas fa-pen"></i></button>
+                <a class="n-actbtn" href="{{ notice_toggle_url }}{{ n.id }}"><i class="fas fa-power-off"></i></a>
+                <button class="n-actbtn del" onclick="confirmDeleteNotice({{ n.id }})"><i class="fas fa-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="8" class="tbl-empty">No notices yet. Create one above.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endif %}
+</body>
+</html>

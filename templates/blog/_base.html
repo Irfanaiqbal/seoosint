@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{ description }}">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="{{ canonical }}">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ title }}">
+  <meta property="og:description" content="{{ description }}">
+  <meta property="og:url" content="{{ canonical }}">
+  <meta property="og:site_name" content="SHADOWTRACE">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ title }}">
+  <meta name="twitter:description" content="{{ description }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/blog.css') }}">
+  {% if jsonld %}
+  <script type="application/ld+json">{{ jsonld|safe }}</script>
+  {% endif %}
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="hrow">
+      <a class="logo" href="/">
+        <div class="logo-mark"><i class="fas fa-crosshairs"></i></div>
+        <span class="logo-text">SHADOWTRACE</span>
+        <span class="logo-badge">v2.0</span>
+      </a>
+      <nav class="hnav">
+        <a href="/" class="nbtn"><i class="fas fa-search"></i> Scanner</a>
+        <a href="/blogs" class="nbtn"><i class="fas fa-book"></i> Blog</a>
+        <a href="mailto:shadowtrace5@proton.me" class="nbtn"><i class="fas fa-envelope"></i> Contact</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main class="blog-main">
+  <div class="wrap blog-wrap">
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="frow">
+      <div class="fcopy">© 2026 SHADOWTRACE · OSINT PLATFORM</div>
+      <div class="flinks">
+        <a href="/">Scanner</a>
+        <a href="/blogs">Blog</a>
+        <a href="mailto:shadowtrace5@proton.me">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+{% extends "blog/_base.html" %}
+{% block content %}
+<div class="breadcrumbs"><a href="/">Home</a> / <a href="/blogs">Blog</a> / Email OSINT Guide</div>
+<h1 class="blog-title">Email OSINT: How to Check What's Exposed About an Email Address</h1>
+<div class="blog-meta"><span><i class="fas fa-calendar"></i> Updated 2026</span><span><i class="fas fa-clock"></i> 5 min read</span></div>
+
+<div class="blog-body">
+<p>An email address is one of the most valuable pivot points in OSINT. It's reused across social platforms, forums, newsletters, and account signups — which means it often leaves a long trail of publicly discoverable data.</p>
+
+<h2>What an Email OSINT Scan Can Reveal</h2>
+<ul>
+  <li>Which platforms and services the address is registered on</li>
+  <li>Whether the address appears in known public data breaches</li>
+  <li>Associated usernames or display names reused across services</li>
+  <li>Rough account creation timelines on some platforms</li>
+</ul>
+
+<h2>Why This Matters</h2>
+<p>Scammers and social engineers use exactly this kind of reconnaissance before a phishing attempt. Knowing what's already exposed lets you close gaps — enable two-factor authentication, rotate passwords, or stop reusing the same email everywhere.</p>
+
+<h2>Doing It Responsibly</h2>
+<p>Only run email OSINT checks on addresses you own or have explicit permission to investigate. Passive lookups against public data are generally acceptable for personal security audits and authorized penetration tests — never for stalking or harassment.</p>
+
+<h2>Try It on SHADOWTRACE</h2>
+<p>SHADOWTRACE's email mode runs a passive scan against public platform and breach-exposure signals in seconds, with no signup required.</p>
+
+<div class="blog-cta">
+  <strong>Check your own email exposure</strong>
+  <p>Free, passive, and takes seconds.</p>
+  <a class="btn" href="/">Run an Email Scan</a>
+</div>
+</div>
+{% endblock %}

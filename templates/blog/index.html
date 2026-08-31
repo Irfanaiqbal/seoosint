@@ -1,0 +1,16 @@
+{% extends "blog/_base.html" %}
+{% block content %}
+<div class="breadcrumbs"><a href="/">Home</a> / Blog</div>
+<h1 class="blog-title">SHADOWTRACE Blog — OSINT Guides &amp; Digital Footprint Tips</h1>
+<p class="blog-lead">Practical, no-fluff guides on open source intelligence, digital footprint hygiene, and how to use SHADOWTRACE effectively.</p>
+
+<div class="blog-grid">
+  {% for post in posts %}
+  <div class="blog-card">
+    <span class="btag">{{ post.tag }}</span>
+    <h2><a href="/blogs/{{ post.slug }}">{{ post.title }}</a></h2>
+    <p>{{ post.excerpt }}</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
