@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import subprocess, threading, queue, time, re, socket, ssl, datetime, os, hashlib, hmac
-from flask import Flask, request, Response, render_template, jsonify, redirect, url_for, session
+from flask import Flask, request, Response, render_template, jsonify, redirect, url_for, session, send_from_directory
 import requests
 import whois
 from collections import deque
@@ -262,6 +262,20 @@ def index():
     return render_template('index.html', notices=get_active_notices())
 
 # ============================================================
+#  PROPELLERADS VERIFICATION / SERVICE WORKER
+#  PropellerAds requires sw.js to be available at the site root:
+#  https://your-domain.com/sw.js
+#  Keep the actual sw.js file beside app.py in the deployed project.
+# ============================================================
+@app.route('/sw.js')
+def propeller_sw():
+    return send_from_directory(
+        os.path.dirname(os.path.abspath(__file__)),
+        'sw.js',
+        mimetype='application/javascript'
+    )
+
+# ============================================================
 #  BLOG — SEO content pages
 # ============================================================
 BLOG_POSTS = {
@@ -278,10 +292,16 @@ BLOG_POSTS = {
         'excerpt': 'What an email OSINT scan can reveal, why it matters for phishing prevention, and how to check your own exposure.',
     },
     'reduce-digital-footprint': {
-        'title': '7 Ways to Reduce Your Digital Footprint in 2026 | SHADOWTRACE',
-        'description': 'Seven practical steps to shrink your public digital footprint, from auditing your exposure to enabling two-factor authentication.',
-        'tag': 'Checklist',
-        'excerpt': 'A practical checklist for shrinking your public digital footprint, starting with a free self-audit.',
+    'title': '7 Ways to Reduce Your Digital Footprint in 2026 | SHADOWTRACE',
+    'description': 'Seven practical steps to shrink your public digital footprint, from auditing your exposure to enabling two-factor authentication.',
+    'tag': 'Checklist',
+    'excerpt': 'A practical checklist for shrinking your public digital footprint, starting with a free self-audit.',
+    },
+    'how-shadowtrace-works': {
+        'title': 'How SHADOWTRACE Works: Passive OSINT Under the Hood | SHADOWTRACE',
+        'description': 'A deep dive into how SHADOWTRACE performs passive OSINT — from Holehe email checks to DNS enumeration, username probing, and phone intelligence.',
+        'tag': 'Technical',
+        'excerpt': 'How each of the four intelligence modes works behind the scenes — the tools, APIs, and methodology powering SHADOWTRACE.',
     },
 }
 
